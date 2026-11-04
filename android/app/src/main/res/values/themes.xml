@@ -1,0 +1,4 @@
+<resources>
+    <!-- Window theme only; the UI itself is themed in Compose (ui/Theme.kt). -->
+    <style name="Theme.Memora" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The Memora server runs on the user's own laptop on the local Wi-Fi and speaks plain HTTP
+     (there is no certificate for a 192.168.x.x address). Requests carry the pairing code; the server
+     only accepts private-network addresses. -->
+<network-security-config xmlns:tools="http://schemas.android.com/tools">
+    <base-config cleartextTrafficPermitted="true" tools:ignore="InsecureBaseConfiguration" />
+</network-security-config>

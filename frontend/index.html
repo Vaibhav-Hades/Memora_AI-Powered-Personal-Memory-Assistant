@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Memora</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%234a4db8'/><circle cx='16' cy='16' r='6' fill='white'/></svg>" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+    <script src="photos.js" defer></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand"><span class="logo" aria-hidden="true"></span><span>Memora</span></div>
+        <nav class="nav" aria-label="Sections">
+          <button data-tab="home" class="active" aria-current="page">Home</button>
+          <button data-tab="photos">Photos</button>
+          <button data-tab="memories">Memories</button>
+          <button data-tab="search">Search</button>
+          <button data-tab="library">Library</button>
+          <button data-tab="settings">Settings</button>
+        </nav>
+        <div class="side-foot">
+          <span id="status" class="pill" role="status">Connecting…</span>
+          <p class="tagline">Your visual memory, understood.</p>
+        </div>
+      </aside>
+
+      <main id="main" class="content">
+        <div id="health-banner" class="banner banner-bad" hidden></div>
+
+        <!-- Home -->
+        <section id="tab-home" class="page">
+          <header class="page-head">
+            <h1 id="greeting" class="display">Welcome</h1>
+            <p id="today" class="muted"></p>
+          </header>
+          <form id="home-form" class="ask-box" role="search">
+            <input id="home-question" autocomplete="off" placeholder="Ask anything about your memories..." aria-label="Ask anything about your memories" />
+            <button class="primary">Ask</button>
+          </form>
+
+          <div id="empty-banner" class="empty" hidden>
+            <h2>Your archive is empty</h2>
+            <p class="muted">Add a folder of photos and documents. Memora reads them on this computer and never uploads them.</p>
+            <button class="primary" data-goto="library">Add a folder</button>
+          </div>
+
+          <dl id="overview" class="overview" hidden>
+            <div><dd id="n-photos">0</dd><dt>Photos</dt></div>
+            <div><dd id="n-docs">0</dd><dt>Documents</dt></div>
+            <div><dd id="n-indexed">0</dd><dt>Indexed</dt></div>
+            <div><dd id="n-failed">0</dd><dt>Need attention</dt></div>
+          </dl>
+
+          <div id="recent-wrap" hidden>
+            <div class="section-head"><h2>Recent memories</h2><button class="link" data-goto="memories">See all</button></div>
+            <ul id="recent" class="rows"></ul>
+          </div>
+        </section>
+
+        <!-- Photos -->
+        <section id="tab-photos" class="page" hidden>
+          <header class="page-head">
+            <h1 class="display">Photos</h1>
+            <p class="muted">Memora keeps each original untouched, reads its details and any text in it, and describes it with an AI model that runs on this computer.</p>
+          </header>
+          <div id="photo-status" class="banner" hidden></div>
+
+          <div id="drop" class="dropzone" tabindex="0" role="group" aria-label="Import photos">
+            <div>
+              <strong>Import photos</strong>
+              <p class="muted small">Drop images here (JPEG, PNG or WebP), or choose them. Identical photos are only kept once.</p>
+            </div>
+            <div class="actions">
+              <button class="primary" id="pick-files" type="button">Choose photos</button>
+              <button class="ghost" id="pick-folder" type="button" hidden>Choose a folder…</button>
+            </div>
+            <input id="photo-input" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" multiple hidden aria-label="Choose photos" />
+            <input id="photo-folder-input" type="file" webkitdirectory multiple hidden aria-label="Choose a folder of photos" />
+          </div>
+
+          <div id="import-panel" class="import-panel" hidden>
+            <div class="section-head">
+              <h2 id="import-title">Ready to import</h2>
+              <span class="actions">
+                <button class="primary" id="import-start" type="button">Import</button>
+                <button id="import-cancel" type="button">Cancel</button>
+                <button class="ghost" id="import-clear" type="button" hidden>Clear</button>
+              </span>
+            </div>
+            <div class="bar" id="import-bar-wrap" hidden><div id="import-bar"></div></div>
+            <p id="import-summary" class="muted" role="status" aria-live="polite"></p>
+            <ul id="import-queue" class="queue"></ul>
+          </div>
+
+          <div class="toolbar" role="search">
+            <input id="photo-q" type="search" placeholder="Search captions, text in photos, notes, tags" aria-label="Search photos" />
+            <select id="photo-sort" aria-label="Sort by">
+              <option value="captured">Date taken</option>
+              <option value="imported">Date imported</option>
+              <option value="name">File name</option>
+            </select>
+            <button id="photo-order" class="ghost" type="button" aria-label="Toggle sort direction">Newest first</button>
+          </div>
+          <div class="toolbar">
+            <label class="check"><input type="checkbox" id="photo-fav" /> Favorites</label>
+            <label class="check"><input type="checkbox" id="photo-undated" /> No capture date</label>
+            <label class="check"><input type="checkbox" id="photo-attn" /> Needs attention</label>
+            <label class="check">From <input type="date" id="photo-from" /></label>
+            <label class="check">To <input type="date" id="photo-to" /></label>
+          </div>
+          <p id="photo-count" class="muted small" role="status"></p>
+          <div id="photo-grid" class="photo-grid"></div>
+          <div class="actions"><button id="photo-more" type="button" hidden>Load more</button></div>
+        </section>
+
+        <!-- Memories (timeline) -->
+        <section id="tab-memories" class="page" hidden>
+          <header class="page-head">
+            <h1 class="display">Memories</h1>
+            <p class="muted">Your indexed photos and documents in time order.</p>
+          </header>
+          <div class="toolbar">
+            <input id="tl-query" type="search" placeholder="Search by file name" aria-label="Filter by file name" />
+            <div class="seg" role="group" aria-label="Type">
+              <button data-kind="all" class="active">All</button><button data-kind="photos">Photos</button><button data-kind="docs">Documents</button>
+            </div>
+            <div class="seg" role="group" aria-label="Group by">
+              <button data-group="day">Day</button><button data-group="month" class="active">Month</button><button data-group="year">Year</button>
+            </div>
+            <div class="seg" role="group" aria-label="Date used">
+              <button data-datekind="mtime" class="active" title="When the file was last changed on this computer">File modified</button>
+              <button data-datekind="indexed_at" title="When Memora indexed the file">Added to Memora</button>
+            </div>
+            <button id="tl-sort" class="ghost">Newest first</button>
+          </div>
+          <p class="muted small">
+            Dates here come from the computer's file records. They are not when a photo was taken: open a photo to see the capture date stored inside it, if it has one.
+          </p>
+          <div id="timeline"></div>
+        </section>
+
+        <!-- Search -->
+        <section id="tab-search" class="page" hidden>
+          <header class="page-head">
+            <h1 class="display">Search</h1>
+            <p class="muted">Ask a question about your files. Answers cite the files they come from.</p>
+          </header>
+          <form id="ask-form" class="ask-box" role="search">
+            <input id="question" autocomplete="off" placeholder="Ask anything about your memories..." aria-label="Question" />
+            <button class="primary" id="ask-button">Ask</button>
+          </form>
+          <div id="examples" class="examples">
+            <button class="chip">Which product has a two-year warranty, and where is its invoice?</button>
+            <button class="chip">When does my passport expire?</button>
+            <button class="chip">How much did I pay for the laptop?</button>
+          </div>
+          <div id="answer-area" aria-live="polite"></div>
+        </section>
+
+        <!-- Library -->
+        <section id="tab-library" class="page" hidden>
+          <header class="page-head">
+            <h1 class="display">Library</h1>
+            <p class="muted">Memora only reads folders you add here. Files stay where they are; processing happens on this computer with your local Ollama models.</p>
+          </header>
+          <form id="folder-form" class="add-folder">
+            <input id="folder-path" placeholder="Paste a folder path, e.g. C:\Users\you\Documents\Receipts" aria-label="Folder path" />
+            <button class="primary">Add &amp; index</button>
+          </form>
+          <div id="suggested" class="examples"></div>
+          <div id="library-error" class="banner banner-bad" hidden></div>
+          <div id="progress" class="progress" hidden>
+            <div id="progress-label" class="progress-label"></div>
+            <div class="bar"><div id="progress-bar"></div></div>
+          </div>
+          <ul id="folders" class="folders"></ul>
+
+          <div class="section-head"><h2 id="files-title">Recent files</h2></div>
+          <div class="table-wrap">
+            <table class="files">
+              <thead><tr><th>Name</th><th>Type</th><th>Size</th><th>Status</th></tr></thead>
+              <tbody id="files"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Settings -->
+        <section id="tab-settings" class="page" hidden>
+          <header class="page-head">
+            <h1 class="display">Settings</h1>
+            <p class="muted">Connect the Android app, and choose how it reaches this computer.</p>
+          </header>
+
+          <div class="group">
+            <h2>Connect your phone on this Wi-Fi</h2>
+            <div id="phone-off" hidden>
+              <p class="muted">
+                Phone access is off. Stop the server and start it with <code>python -m memora --lan --port 8010</code>,
+                with the phone and this computer on the same Wi-Fi.
+              </p>
+            </div>
+            <div id="phone-on" hidden>
+              <p class="muted">In the Android app, open Settings → Laptop connection and enter:</p>
+              <dl class="pairing">
+                <dt>Address</dt><dd id="phone-addresses"></dd>
+                <dt>Port</dt><dd id="phone-port"></dd>
+                <dt>Pairing code</dt><dd id="phone-code" class="code"></dd>
+              </dl>
+              <p class="muted small">
+                Only devices with this code can use Memora. If the phone can't connect, allow port
+                <span id="phone-port-2"></span> through Windows Firewall for private networks (see README).
+              </p>
+            </div>
+          </div>
+
+          <div class="group">
+            <h2>Tailscale <span id="ts-state" class="tag">off</span></h2>
+            <p class="muted">
+              Optional. Lets the phone reach this computer from another network through your private Tailscale network.
+              Install the official Tailscale app on both devices and sign in to the same account. Tailscale doesn't make Memora
+              available when this computer is off, and Memora still requires the pairing code.
+            </p>
+            <div id="ts-off" hidden>
+              <p>To turn it on, stop the server and start it with:</p>
+              <p><code>python -m memora --lan --tailscale --port 8010</code></p>
+            </div>
+            <div id="ts-on" hidden>
+              <dl class="pairing">
+                <dt>Tailscale address</dt><dd id="ts-addresses"></dd>
+                <dt>Port</dt><dd id="ts-port"></dd>
+              </dl>
+              <p class="muted small">Enter this address in the Android app: Settings → Tailscale.</p>
+            </div>
+            <p class="muted small">
+              Windows Firewall: if the phone can't connect through Tailscale, allow inbound TCP on the Memora port from the Tailscale
+              range only, for example
+              <code>New-NetFirewallRule -DisplayName "Memora (Tailscale)" -Direction Inbound -Protocol TCP -LocalPort 8010 -RemoteAddress 100.64.0.0/10 -Action Allow</code>.
+              Don't open the port to other addresses. Use Tailscale's access controls to decide which of your devices may reach this computer.
+            </p>
+          </div>
+
+          <div class="group">
+            <h2>Photo analysis <span id="vision-state" class="tag">checking</span></h2>
+            <p id="vision-detail" class="muted"></p>
+            <p class="muted small">
+              Photos are read and described by a model running in Ollama on this computer, and text in photos is read with Windows' built-in
+              text recognition. Nothing is sent to any online service. The model is chosen with <code>MEMORA_VISION_MODEL</code>
+              (default: the chat model, if it can see images).
+            </p>
+            <div class="actions">
+              <button id="vision-run" type="button">Describe photos that aren't described yet</button>
+              <button id="vision-retry" type="button">Retry failed photos</button>
+              <span id="vision-msg" class="muted small" role="status"></span>
+            </div>
+          </div>
+
+          <div class="group">
+            <h2>Privacy</h2>
+            <p class="muted">
+              Your files and their text stay on this computer. This page is only served to this computer; phones can use the API only,
+              and only with the pairing code. Memora's web page keeps no analytics.
+            </p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Detail panel -->
+    <div id="detail" class="detail" hidden role="dialog" aria-modal="true" aria-labelledby="detail-title">
+      <div class="detail-scrim" data-close></div>
+      <div class="detail-panel">
+        <button class="ghost close" data-close aria-label="Close details">Close</button>
+        <div id="detail-body"></div>
+      </div>
+    </div>
+  </body>
+</html>

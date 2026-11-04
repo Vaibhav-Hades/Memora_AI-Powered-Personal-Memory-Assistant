@@ -1,0 +1,24 @@
+backend/.venv/
+backend/data/
+__pycache__/
+.pytest_cache/
+
+android/.gradle/
+android/.kotlin/
+android/build/
+android/app/build/
+android/local.properties
+android/.idea/
+
+# Build artifacts, local tooling, models and keys (never commit these)
+dist/
+.claude/
+*.apk
+*.aab
+*.litertlm
+*.gguf
+*.jks
+*.keystore
+*.sqlite3
+*.sqlite3-*
+pairing-code.txt

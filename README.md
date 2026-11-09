@@ -119,7 +119,16 @@ Windows blocks incoming connections by default, so you need to do this once.
 
 ## 2. Android app
 
-**Download:** [Memora.apk](https://github.com/Vaibhav-Hades/Memora_AI-Powered-Personal-Memory-Assistant/releases/download/v0.3.0/Memora.apk) (Android 9+, all phone CPU types). Open it on the phone and allow installs from that source.
+### Download the app (Android)
+
+[**Download Memora.apk**](https://github.com/Vaibhav-Hades/Memora_AI-Powered-Personal-Memory-Assistant/releases/download/v0.3.0/Memora.apk) (about 98 MB). It works on Android 9 or newer and on all phone CPU types. All releases are on the [Releases page](https://github.com/Vaibhav-Hades/Memora_AI-Powered-Personal-Memory-Assistant/releases).
+
+1. On your phone, open the download link above in the browser (or send the link to your phone) and download `Memora.apk`. If the browser warns that this type of file can be harmful, choose **Download anyway**; the app is not on the Play Store.
+2. Open the downloaded file. When Android asks, allow **Install unknown apps** for that browser or file manager (*Settings → Apps → Special access → Install unknown apps*), then tap **Install**.
+3. Open **Memora**. Use **Phone only** mode right away, or connect to your laptop's AI server (see section 1) from **Settings**.
+4. To share the app, send anyone the same download link, or the `Memora.apk` file itself.
+
+The app can't be installed on iPhones. You can check the download is intact with its SHA-256: `10a5aefcae88f19eae1559d28ef9908aa5254550fd1a38df827eddca339e86e3`.
 
 Kotlin, Jetpack Compose (Material 3), OkHttp, Kotlin coroutines, and the Android Photo Picker. It runs on Android 9+ (minSdk 28, targetSdk 36).
 

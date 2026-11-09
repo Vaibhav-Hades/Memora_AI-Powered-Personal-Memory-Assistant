@@ -119,6 +119,8 @@ Windows blocks incoming connections by default, so you need to do this once.
 
 ## 2. Android app
 
+**Download:** [Memora.apk](https://github.com/Vaibhav-Hades/Memora_AI-Powered-Personal-Memory-Assistant/releases/download/v0.3.0/Memora.apk) (Android 9+, all phone CPU types). Open it on the phone and allow installs from that source.
+
 Kotlin, Jetpack Compose (Material 3), OkHttp, Kotlin coroutines, and the Android Photo Picker. It runs on Android 9+ (minSdk 28, targetSdk 36).
 
 ### Build
